@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Finder</title>
+    <!-- <link rel="stylesheet" href="./styles.css"> -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,6 +17,7 @@
         .search-box {
             display: flex;
             justify-content: center;
+            padding-top: 20px;
             margin-bottom: 20px;
         }
         .search-box input {
@@ -74,13 +76,48 @@
             color: #6d0f0f;
         }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .hero {
+            height: 300px; /* Full screen height */
+            background: url('heroFoodImage.jpg') no-repeat center center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            /* color: white;
+            font-size: 3rem; */
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Dark overlay for readability */
+        }
+
+        .hero h1 {
+            position: relative;
+            z-index: 1;
+        }
+
+
     </style>
 </head>
 <body>
-
-    <h1 id="title"></h1>
-    <h1>Recipe Finder</h1>
-
+    <div class="hero">
+        <h1 id="title"></h1>
+        <!-- <h1>Recipe Finder</h1> -->
+    </div>
     <div class="search-box">
         <input type="text" id="search-input" placeholder="Search for a meal..." onkeyup="searchMeals()">
     </div>
