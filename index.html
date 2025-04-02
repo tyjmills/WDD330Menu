@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #0f9e9e;
+        }
+        h1 {
+            text-align: center;
+        }
+        .search-box {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            width: 50%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .meal {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .meal:hover {
+            transform: scale(1.05);
+        }
+        .meal img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .details {
+            display: none;
+            margin-top: 10px;
+            text-align: left;
+        }
+        .details ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .details ul li {
+            background: #f1f1f1;
+            margin: 3px 0;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .details a {
+            display: block;
+            margin-top: 10px;
+            color: blue;
+        }
+        #title {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #6d0f0f;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1 id="title"></h1>
+    <h1>Recipe Finder</h1>
+
+    <div class="search-box">
+        <input type="text" id="search-input" placeholder="Search for a meal..." onkeyup="searchMeals()">
+    </div>
+
+    <div class="container" id="meal-list"></div>
+
+    <script>
+        async function fetchRecipesByName(name) {
+            try {
+                let response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${name}`);
+                let data = await response.json();
+                return data.meals || [];
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                return [];
+            }
+        }
+
+        function getIngredients(meal) {
+            let ingredients = [];
+            for (let i = 1; i <= 20; i++) {
+                let ingredient = meal[`strIngredient${i}`];
+                let measure = meal[`strMeasure${i}`];
+                if (ingredient && ingredient.trim() !== "") {
+                    ingredients.push(`${measure} ${ingredient}`);
+                }
+            }
+            return ingredients;
+        }
+
+        async function searchMeals() {
+            let searchInput = document.getElementById("search-input").value.trim();
+            let mealList = document.getElementById("meal-list");
+
+            if (searchInput === "") {
+                mealList.innerHTML = "<p style='text-align:center;'>Start typing to search for meals...</p>";
+                return;
+            }
+
+            let meals = await fetchRecipesByName(searchInput);
+            mealList.innerHTML = ""; // Clear previous results
+
+            if (meals.length === 0) {
+                mealList.innerHTML = "<p style='text-align:center;'>No meals found. Try a different name.</p>";
+                return;
+            }
+
+            meals.forEach(meal => {
+                let mealDiv = document.createElement("div");
+                mealDiv.classList.add("meal");
+
+                let ingredientsList = getIngredients(meal)
+                    .map(item => `<li>${item}</li>`)
+                    .join("");
+
+                mealDiv.innerHTML = `
+                    <h3>${meal.strMeal}</h3>
+                    <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+                    <p><strong>Category:</strong> ${meal.strCategory}</p>
+                    <div class="details">
+                        <p><strong>Area:</strong> ${meal.strArea}</p>
+                        <p><strong>Ingredients:</strong></p>
+                        <ul>${ingredientsList}</ul>
+                        <p><strong>Instructions:</strong> ${meal.strInstructions}</p>
+                        <a href="${meal.strYoutube}" target="_blank">Watch Video</a>
+                    </div>
+                `;
+
+                mealDiv.addEventListener("click", () => {
+                    let details = mealDiv.querySelector(".details");
+                    details.style.display = details.style.display === "none" || details.style.display === "" ? "block" : "none";
+                });
+
+                mealList.appendChild(mealDiv);
+            });
+        }
+    </script>
+    <script>
+        const text = "Let's Get Cook'n!";
+        let index = 0;
+        function typeTitle() {
+            if (index < text.length) {
+                document.getElementById("title").textContent += text.charAt(index);
+                index++;
+                setTimeout(typeTitle, 100); // Adjust speed here
+            }
+        }
+        window.onload = typeTitle; // Start animation when page loads
+    </script>
+
+
+</body>
+</html>
